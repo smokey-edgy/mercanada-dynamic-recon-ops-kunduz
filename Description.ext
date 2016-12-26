@@ -1,0 +1,33 @@
+#include "sunday_system\dialogs\defines.hpp"
+#include "sunday_system\dialogs\dialogs.hpp"
+
+enableDebugConsole = 1;
+
+corpseManagerMode = 1;
+corpseLimit = 1;
+corpseRemovalMinTime = 900;
+corpseRemovalMaxTime = 3600;
+
+respawn = 3;
+respawnButton = 0;
+respawnDelay = 45;
+respawnVehicleDelay = 30;
+respawnDialog = 0;
+respawnOnStart = 0;
+respawnTemplates[] = {"MenuPosition", "Tickets", "Spectator", "EndMission"};
+
+class Params
+{
+	class Respawn
+	{
+		title = "Respawn";
+		values[] = {0,1};
+		texts[] = {"Enabled","Disabled"};
+		default = 0;               
+	};		
+};
+
+
+
+
+
