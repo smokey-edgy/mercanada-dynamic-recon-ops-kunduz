@@ -6,5 +6,6 @@ if (isMultiplayer) then {
 		[missionNamespace, -2000] call BIS_fnc_respawnTickets;
 		//setPlayerRespawnTime 0;
 	};
-};
 
+	[] execVM "open_doors_hack\openDoorsHack.sqf";
+};
