@@ -18,7 +18,7 @@ SE_fnc_nearestRoad = {
 
 HM_fnc_spawnAnaSquad = {
   params ["_xPos", "_yPos"];
-  private ["_patrolGroup", "_leader", "_nearestRoad", "_nearestCity", "_wp", "_combatPosition"];
+  private ["_patrolGroup", "_leader", "_nearestRoad", "_nearestCity", "_wp", "_trigger"];
 
   _nearestRoad = ([_xPos, _yPos] call SE_fnc_nearestRoad);
 
@@ -26,24 +26,19 @@ HM_fnc_spawnAnaSquad = {
   _patrolGroup setFormation "FILE";
   _patrolGroup setCombatMode "YELLOW";
   _leader = leader _patrolGroup;
-  _leader switchMove "";
 
   _nearestCity = (nearestLocations [[_xPos, _yPos], ["NameLocal","NameVillage","NameCity","NameCityCapital"], 5000]) select 0;
 
-  _combatPosition = [];
-  _combatPosition pushBack (position _nearestCity select 0) - 50;
-  _combatPosition pushBack (position _nearestCity select 1) - 50;
-  _combatPosition pushBack (position _nearestCity select 2);
-
-  _wp = _patrolGroup addWaypoint [_combatPosition, 0];
-  _wp setWaypointSpeed "LIMITED";
-  _wp setWaypointBehaviour "CARELESS";
-  _wp setWaypointType "MOVE";
+  _trigger = createTrigger ["EmptyDetector", position _nearestCity];
+  _trigger setTriggerArea  [200, 200, 0, false];
+  _trigger setTriggerActivation ["WEST", "PRESENT", true];
+  _trigger setTriggerStatements ["this", "{(group _x) setBehaviour 'COMBAT'; } forEach thisList;",
+                                    ""];
 
   _wp = _patrolGroup addWaypoint [position _nearestCity, 0];
   _wp setWaypointSpeed "LIMITED";
-  _wp setWaypointBehaviour "COMBAT";
-  _wp setWaypointType "SAD";
+  _wp setWaypointBehaviour "CARELESS";
+  _wp setWaypointType "MOVE";
 };
 
 HM_fnc_spawnOpforInCompounds = {
@@ -58,8 +53,7 @@ HM_fnc_spawnOpforInCompounds = {
     _compound = nearestBuilding _spawnPos;
     _buildingPositions = (_compound buildingPos -1) select [0, 2];
     {
-      systemChat format ["pos %1", _x];
-      _opFor = [_x, opfor, 2] call BIS_fnc_spawnGroup;
+      _opFor = [_x, opfor, ["TBan_Warlord", "TBan_Warlord"]] call BIS_fnc_spawnGroup;
     } forEach _buildingPositions;
   } forEach _bestCompounds;
 };
