@@ -53,6 +53,7 @@ fnc_generateAO = compile preprocessFile "sunday_system\generateAO.sqf";
 fnc_selectObjective = compile preprocessFile "sunday_system\objSelect.sqf";
 fnc_selectReactiveObjective = compile preprocessFile "sunday_system\objectives\selectReactiveTask.sqf";
 fnc_defineFactionClasses = compile preprocessFile "sunday_system\defineFactionClasses.sqf";
+fnc_generateEngagements = compile preprocessFile "hearts_and_minds\generateEngagements.sqf";
 
 blackList = [];
 
@@ -68,7 +69,7 @@ _factionsWithUnits = [];
 
 // Record all factions with valid vehicles
 {
-	
+
 	_factionsWithUnits pushBackUnique ((configFile >> "CfgVehicles" >> (configName _x) >> "faction") call BIS_fnc_GetCfgData);
 } forEach ("(configName _x) isKindOf 'AllVehicles'" configClasses (configFile / "CfgVehicles"));
 diag_log _factionsWithUnits;
@@ -87,7 +88,7 @@ diag_log format ["DRO: Unavailable factions: %1", _unavailableFactions];
 {
 	_thisFaction = _x;
 	_thisSideNum = ((configFile >> "CfgFactionClasses" >> _thisFaction >> "side") call BIS_fnc_GetCfgData);
-	
+
 	if (typeName _thisSideNum == "TEXT") then {
 		if ((["west", _thisSideNum, false] call BIS_fnc_inString)) then {
 			_thisSideNum = 1;
@@ -98,24 +99,24 @@ diag_log format ["DRO: Unavailable factions: %1", _unavailableFactions];
 		if ((["guer", _thisSideNum, false] call BIS_fnc_inString) || (["ind", _thisSideNum, false] call BIS_fnc_inString)) then {
 			_thisSideNum = 2;
 		};
-	};	
-	
+	};
+
 	if (typeName _thisSideNum == "SCALAR") then {
 		if (_thisSideNum <= 3 && _thisSideNum > -1) then {
-				
-			_thisFactionName = ((configFile >> "CfgFactionClasses" >> _thisFaction >> "displayName") call BIS_fnc_GetCfgData);			
+
+			_thisFactionName = ((configFile >> "CfgFactionClasses" >> _thisFaction >> "displayName") call BIS_fnc_GetCfgData);
 			_thisFactionFlag = ((configfile >> "CfgFactionClasses" >> _thisFaction >> "flag") call BIS_fnc_GetCfgData);
-			
+
 			if (_thisFaction in _unavailableFactions) then {
-				
+
 			} else {
 				if (!isNil "_thisFactionFlag") then {
 					availableFactionsData pushBack [_thisFaction, _thisFactionName, _thisFactionFlag, _thisSideNum];
 				} else {
 					availableFactionsData pushBack [_thisFaction, _thisFactionName, "", _thisSideNum];
 				};
-			};		
-		};	
+			};
+		};
 	};
 } forEach _availableFactions;
 
@@ -225,9 +226,9 @@ publicVariable "unitList";
 
 // Init player unit lobby variables
 {
-	_thisUnitType = (selectRandom unitList);	
-	[[_x, _thisUnitType], 'sunday_system\switchUnitLoadout.sqf'] remoteExec ["execVM", _x, false];	
-	
+	_thisUnitType = (selectRandom unitList);
+	[[_x, _thisUnitType], 'sunday_system\switchUnitLoadout.sqf'] remoteExec ["execVM", _x, false];
+
 	switch (_x) do {
 		case u1: {
 			_x setVariable ['unitLoadoutIDC', 1201, true];
@@ -269,7 +270,7 @@ publicVariable "unitList";
 			_x setVariable ['unitArsenalIDC', 1308, true];
 			_x setVariable ['unitDeleteIDC', 1508, true];
 		};
-	};	
+	};
 } forEach playerGroup;
 
 // *****
@@ -295,29 +296,29 @@ switch (_enemySideNum) do {
 
 markerColorPlayers = "colorBLUFOR";
 switch (playersSide) do {
-	case west: {		
+	case west: {
 		markerColorPlayers = "colorBLUFOR";
 	};
-	case east: {		
+	case east: {
 		markerColorPlayers = "colorOPFOR";
 	};
-	case resistance: {		
+	case resistance: {
 		markerColorPlayers = "colorIndependent";
-	};	
+	};
 };
 publicVariable "markerColorPlayers";
 
 markerColorEnemy = "colorOPFOR";
 switch (enemySide) do {
-	case west: {		
+	case west: {
 		markerColorEnemy = "colorBLUFOR";
 	};
-	case east: {		
+	case east: {
 		markerColorEnemy = "colorOPFOR";
 	};
-	case resistance: {		
+	case resistance: {
 		markerColorEnemy = "colorIndependent";
-	};	
+	};
 };
 publicVariable "markerColorEnemy";
 
@@ -349,16 +350,16 @@ _enemyFactionFlag = "";
 _nonBaseFaction = 0;
 
 if (!isNil "_enemyFactionName") then {
-	{ 
+	{
 		if (((configFile >> "CfgMarkers" >> (configName _x) >> "name") call BIS_fnc_GetCfgData) == _enemyFactionName) then {
-			_enemyFactionFlag = (configName _x);			
+			_enemyFactionFlag = (configName _x);
 		};
 	} forEach ("true" configClasses (configFile / "CfgMarkers"));
 };
 
 if (count _enemyFactionFlag == 0) then {
-	if (!isNil "_enemyFactionFlagIcon") then {		
-		{ 
+	if (!isNil "_enemyFactionFlagIcon") then {
+		{
 			if ([((configFile >> "CfgMarkers" >> (configName _x) >> "icon") call BIS_fnc_GetCfgData), _enemyFactionFlagIcon, false] call BIS_fnc_inString) then {
 				_enemyFactionFlag = (configName _x);
 				_nonBaseFaction = 1;
@@ -423,17 +424,17 @@ switch (timeOfDay) do {
 			_fog = [(random 0.05), (random [0.02, 0.045, 0.03]), (random [20, 100, 40])]
 		} else {
 			_fog = 0;
-		};				
+		};
 		_overcast = (random [0, 0.4, 1]);
-		skipTime _dawnNum;				
+		skipTime _dawnNum;
 	};
 	case 2: {
-		// DAY		
-		_dayTime = [_dawnNum, _duskNum] call BIS_fnc_randomNum;		
-		_overcast = (random 1);		
+		// DAY
+		_dayTime = [_dawnNum, _duskNum] call BIS_fnc_randomNum;
+		_overcast = (random 1);
 		_fog = ([0,1] call BIS_fnc_randomInt);
-		if (_fog == 1) then {_fog = [(random [0, (_overcast/6), 0]), 0, 0]};	
-		skipTime _dayTime;				
+		if (_fog == 1) then {_fog = [(random [0, (_overcast/6), 0]), 0, 0]};
+		skipTime _dayTime;
 	};
 	case 3: {
 		// DUSK
@@ -442,20 +443,20 @@ switch (timeOfDay) do {
 			_fog = [(random 0.05), (random [0.02, 0.045, 0.03]), (random [20, 100, 40])]
 		} else {
 			_fog = 0;
-		};		
-		_overcast = (random [0, 0.4, 1]);		
-		skipTime _duskNum;			
+		};
+		_overcast = (random [0, 0.4, 1]);
+		skipTime _duskNum;
 	};
 	case 4: {
 		// NIGHT
 		_nightTime1 = [(_duskNum + 1), 24] call BIS_fnc_randomNum;
 		_nightTime2 = [0, (_dawnNum - 1)] call BIS_fnc_randomNum;
-		_nightTime = selectRandom [_nightTime1, _nightTime2];				
-		_overcast = (random [0, 0.4, 1]);				
+		_nightTime = selectRandom [_nightTime1, _nightTime2];
+		_overcast = (random [0, 0.4, 1]);
 		_fog = ([0,1] call BIS_fnc_randomInt);
 		if (_fog == 1) then {_fog = [(random [0, (_overcast/6), 0]), 0, 0]};
 		skipTime _nightTime;
-						
+
 	};
 };
 sleep 0.1;
@@ -465,7 +466,7 @@ _fog call BIS_fnc_setFog;
 simulWeatherSync;
 _nextOvercast = (random 1);
 _nextFog = if (_nextOvercast < 0.5) then {
-	[(random 0.03), 0, 0];	
+	[(random 0.03), 0, 0];
 } else {
 	[(random 0.10), 0, 0];
 };
@@ -480,14 +481,14 @@ diag_log format ["DRO: time of day is %1", timeOfDay];
 
 // Intro Music
 _musicArrayDay = [
-	"LeadTrack02_F_EXP",	
+	"LeadTrack02_F_EXP",
 	"AmbientTrack03_F",
 	"LeadTrack02_F_EPA",
 	"LeadTrack01_F_EPA",
 	"LeadTrack03_F_EPA",
 	"LeadTrack01_F_EPB",
 	"LeadTrack06_F",
-	"BackgroundTrack02_F_EPC",	
+	"BackgroundTrack02_F_EPC",
 	"LeadTrack03_F_Mark",
 	"LeadTrack02_F_EPB"
 ];
@@ -500,7 +501,7 @@ _musicArrayNight = [
 	"LeadTrack03_F_EPA",
 	"LeadTrack03_F_EPC",
 	"BackgroundTrack04_F_EPC",
-	"EventTrack03_F_EPC"	
+	"EventTrack03_F_EPC"
 ];
 _track = nil;
 if (timeOfDay <= 2) then {
@@ -522,15 +523,15 @@ _missionName = switch (_missionNameType) do {
 		_name2Array = ["bowl", "catcher", "fisher", "claw", "house", "master", "man", "fly", "market", "cap", "wind", "break", "cut", "tree", "woods", "fall", "force", "storm", "blade", "knife", "cut", "cutter", "taker", "torch"];
 		format ["Operation %1%2", selectRandom _name1Array, selectRandom _name2Array];
 	};
-	case "TwoWords": {		
-		_name1Array = ["Midnight", "Fallen", "Turbulent", "Nesting", "Daunting", "Dogged", "Darkened", "Shallow", "Second", "First", "Third", "Blank", "Absent", "Parallel", "Restless"];		
+	case "TwoWords": {
+		_name1Array = ["Midnight", "Fallen", "Turbulent", "Nesting", "Daunting", "Dogged", "Darkened", "Shallow", "Second", "First", "Third", "Blank", "Absent", "Parallel", "Restless"];
 		_useWorldName = random 1;
 		_name2Array = if (_useWorldName > 0.2) then {
 			["Sky", "Moon", "Sun", "Hand", "Monk", "Priest", "Viper", "Snake", "Boon", "Cannon", "Market", "Rook", "Knight", "Bishop", "Command", "Mirror", "Crisis", "Spider", "Charter", "Court", "Hearth"]
 		} else {
 			[worldName]
-		};				
-		
+		};
+
 		format ["Operation %1 %2", selectRandom _name1Array, selectRandom _name2Array];
 	};
 };
@@ -559,11 +560,11 @@ for "_i" from 0 to count _lastNameClass - 1 do {
 // Extract voice data
 _speakersArray = [];
 {
-	_thisVoice = (configName _x);	
+	_thisVoice = (configName _x);
 	_scopeVar = typeName ((configFile >> "CfgVoice" >> _thisVoice >> "scope") call BIS_fnc_GetCfgData);
 	switch (_scopeVar) do {
 		case "STRING": {
-			if ( ((configFile >> "CfgVoice" >> _thisVoice >> "scope") call BIS_fnc_GetCfgData) == "public") then {		
+			if ( ((configFile >> "CfgVoice" >> _thisVoice >> "scope") call BIS_fnc_GetCfgData) == "public") then {
 				{
 					if (typeName _x == "STRING") then {
 						if (pLanguage == _x) then {
@@ -571,23 +572,23 @@ _speakersArray = [];
 						};
 					};
 				} forEach ((configFile >> "CfgVoice" >> _thisVoice >> "identityTypes") call BIS_fnc_GetCfgData);
-			};	
-		};		
+			};
+		};
 		case "SCALAR": {
-			if ( ((configFile >> "CfgVoice" >> _thisVoice >> "scope") call BIS_fnc_GetCfgData) == 2) then {		
-				{			
+			if ( ((configFile >> "CfgVoice" >> _thisVoice >> "scope") call BIS_fnc_GetCfgData) == 2) then {
+				{
 					if (typeName _x == "STRING") then {
 						if (pLanguage == _x) then {
 							_speakersArray pushBack _thisVoice;
 						};
 					};
 				} forEach ((configFile >> "CfgVoice" >> _thisVoice >> "identityTypes") call BIS_fnc_GetCfgData);
-			};	
-		};		
-	};	
+			};
+		};
+	};
 } forEach ("true" configClasses (configFile / "CfgVoice"));
 
-if (count _speakersArray == 0) then {	
+if (count _speakersArray == 0) then {
 	switch (playersSide) do {
 		case west: {
 			_speakersArray = ["Male01ENG", "Male02ENG", "Male03ENG", "Male04ENG", "Male05ENG", "Male06ENG", "Male07ENG", "Male08ENG", "Male10ENG", "Male11ENG", "Male12ENG", "Male01ENGB", "Male02ENGB", "Male03ENGB", "Male04ENGB", "Male05ENGB"];
@@ -598,7 +599,7 @@ if (count _speakersArray == 0) then {
 		case resistance: {
 			_speakersArray = ["Male01GRE", "Male02GRE", "Male03GRE", "Male04GRE", "Male05GRE", "Male06GRE"];
 		};
-	};	
+	};
 };
 
 diag_log format ["DRO: Available voices: %1", _speakersArray];
@@ -606,14 +607,14 @@ diag_log format ["DRO: Available voices: %1", _speakersArray];
 // Change units to correct ethnicity and voices
 nameLookup = [];
 {
-	_thisUnit = _x;			
+	_thisUnit = _x;
 	if (count _speakersArray > 0) then {
 		_firstName = selectRandom _firstNames;
 		_lastName = selectRandom _lastNames;
 		_speaker = selectRandom _speakersArray;
 		[[_thisUnit, _firstName, _lastName, _speaker], 'sun_setNameMP', true] call BIS_fnc_MP;
 		nameLookup pushBack [_firstName, _lastName];
-	};			
+	};
 } forEach playerGroup;
 publicVariable "nameLookup";
 
@@ -664,7 +665,7 @@ taskIDs = [];
 reconPatrolUnused = true;
 for "_i" from 1 to (_numObjs) do {
 	_thisObj = [_prevObj] call fnc_selectObjective;
-	_prevObj = _thisObj;	
+	_prevObj = _thisObj;
 };
 waitUntil {count allObjectives == _numObjs};
 diag_log format ["allObjectives = %1", allObjectives];
@@ -676,8 +677,8 @@ diag_log format ["allObjectives = %1", allObjectives];
 		// Create task for task data
 		diag_log "DRO: Creating regular task";
 		_markerPos = getMarkerPos (_x select 3);
-		
-		_id = [(_x select 0), true, [(_x select 1), (_x select 2), (_x select 3)], [(_markerPos select 0), (_markerPos select 1), 0], "CREATED", 1, false, true, (_x select 4), true] call BIS_fnc_setTask;		
+
+		_id = [(_x select 0), true, [(_x select 1), (_x select 2), (_x select 3)], [(_markerPos select 0), (_markerPos select 1), 0], "CREATED", 1, false, true, (_x select 4), true] call BIS_fnc_setTask;
 		taskIDs pushBack _id;
 		diag_log ["DRO: taskIDs is now: %1", taskIDs];
 		if (markerShape (_x select 3) == "ICON") then {
@@ -692,8 +693,8 @@ diag_log format ["allObjectives = %1", allObjectives];
 			// Create task for task data
 			diag_log "DRO: Creating regular task as task is already a recon task";
 			_markerPos = getMarkerPos (_x select 3);
-						
-			_id = [(_x select 0), true, [(_x select 1), (_x select 2), (_x select 3)], [(_markerPos select 0), (_markerPos select 1), 0], "CREATED", 1, false, true, (_x select 4), true] call BIS_fnc_setTask;			
+
+			_id = [(_x select 0), true, [(_x select 1), (_x select 2), (_x select 3)], [(_markerPos select 0), (_markerPos select 1), 0], "CREATED", 1, false, true, (_x select 4), true] call BIS_fnc_setTask;
 			taskIDs pushBack _id;
 			diag_log ["DRO: taskIDs is now: %1", taskIDs];
 			if (markerShape (_x select 3) == "ICON") then {
@@ -718,30 +719,30 @@ diag_log format ["allObjectives = %1", allObjectives];
 // Collect civilian classes
 civClasses = [];
 {
-	if (((configFile >> "CfgVehicles" >> (configName _x) >> "faction") call BIS_fnc_GetCfgData) == civFaction) then {		
-		if ( ((configFile >> "CfgVehicles" >> (configName _x) >> "scope") call BIS_fnc_GetCfgData) == 2) then {	
+	if (((configFile >> "CfgVehicles" >> (configName _x) >> "faction") call BIS_fnc_GetCfgData) == civFaction) then {
+		if ( ((configFile >> "CfgVehicles" >> (configName _x) >> "scope") call BIS_fnc_GetCfgData) == 2) then {
 			if (configName _x isKindOf 'Man') then {
 				if (
 					(["_vr_", (configName _x), false] call BIS_fnc_inString) ||
 					(["driver", (configName _x), false] call BIS_fnc_inString) ||
 					(count ((configFile >> "CfgVehicles" >> (configName _x) >> "weapons") call BIS_fnc_GetCfgData) > 2)
 				) then {
-				
+
 				} else {
 					civClasses pushBack (configName _x);
-				};				
+				};
 			};
 		};
 	};
 } forEach ("true" configClasses (configFile / "CfgVehicles"));
 
 // Civilians only spawned if time of day is not nighttime
-if (timeOfDay <= 3) then {	
+if (timeOfDay <= 3) then {
 	_civilians = random 100;
 	if (_civilians > 60) then {
-		civTrue = true;	
-		[_randomLoc] execVM "sunday_system\generateCivilians.sqf";	
-	};	
+		civTrue = true;
+		[_randomLoc] execVM "sunday_system\generateCivilians.sqf";
+	};
 };
 
 missionNameSpace setVariable ["objectivesSpawned", 1, true];
@@ -772,8 +773,14 @@ switch (AO_Type) do {
 waitUntil {(missionNameSpace getVariable "lobbyComplete") == 1};
 
 _setupPlayersHandle = [_center, playerGroup] execVM "sunday_system\setupPlayersFaction.sqf";
+
 waitUntil {scriptDone _setupPlayersHandle};
 diag_log "DRO: setupPlayersFaction completed";
+
+_playerGroupPosition = position (playerGroup select 0);
+
+diag_log format ["HM: About to generate ANA and OpFor engagements"];
+[_playerGroupPosition] call fnc_generateEngagements;
 
 // *****
 // MISC EXTRAS
@@ -791,19 +798,19 @@ for "_i" from 1 to _numEscapeVehicles do {
 	if (count _vehClass > 0) then {
 		_pos = [AO_roadPosArray] call dro_selectRemove;
 		_veh = _vehClass createVehicle _pos;
-		
+
 		_roadList = _pos nearRoads 10;
 		if (count _roadList > 0) then {
 			_thisRoad = _roadList select 0;
 			_roadConnectedTo = roadsConnectedTo _thisRoad;
 			_direction = 0;
 			if (count _roadConnectedTo == 0) then {
-				_direction = 0; 
+				_direction = 0;
 			} else {
 				_connectedRoad = _roadConnectedTo select 0;
 				_direction = [_thisRoad, _connectedRoad] call BIS_fnc_DirTo;
 			};
-			
+
 			_veh setDir _direction;
 			_newPos = [_pos, 4, (_direction + 90)] call dro_extendPos;
 			_veh setPos _newPos;
@@ -852,8 +859,8 @@ _trgReinf setVariable ["DROgroupPlayers", (grpNetId call BIS_fnc_groupFromNetId)
 
 diag_log format ["DRO: taskIDs = %1", taskIDs];
 
-waituntil { 
-	sleep 10;	
+waituntil {
+	sleep 10;
 	_completeReturn = true;
 	{
 		_complete = [_x] call BIS_fnc_taskCompleted;
@@ -861,7 +868,7 @@ waituntil {
 			_completeReturn = false;
 		};
 	} forEach taskIDs;
-	_completeReturn	
+	_completeReturn
 };
 
 // Once all basic tasks are complete wait until any reactive tasks are also complete
@@ -869,7 +876,7 @@ _reactiveChance = random 100;
 if (_reactiveChance > 70) then {
 	diag_log "DRO: Creating reactive task";
 	_thisObj = [] call fnc_selectReactiveObjective;
-	waituntil { 
+	waituntil {
 		sleep 10;
 		_completeReturn = true;
 		{
@@ -878,7 +885,7 @@ if (_reactiveChance > 70) then {
 				_completeReturn = false;
 			};
 		} forEach taskIDs;
-		_completeReturn		
+		_completeReturn
 	};
 };
 
@@ -892,14 +899,14 @@ _heliTransports = [];
 } forEach pHeliClasses;
 
 // Create extract task
-if ((count _heliTransports) > 0) then {	
+if ((count _heliTransports) > 0) then {
 	_taskCreated = ["taskExtract", true, ["Extract from the AO. A helicopter transport is available to support. Alternatively leave the AO by any means available.", "Extract", ""], objNull, "CREATED", 5, true, true, "default", true] call BIS_fnc_setTask;
-	//_taskCreated = [DROgroupPlayers, ["taskExtract"], ["Extract from the AO. A helicopter transport is available to support. Alternatively leave the AO by any means available.", "Extract", ""], objNull, true, 5, true, "default", false] call BIS_fnc_taskCreate;	
+	//_taskCreated = [DROgroupPlayers, ["taskExtract"], ["Extract from the AO. A helicopter transport is available to support. Alternatively leave the AO by any means available.", "Extract", ""], objNull, true, 5, true, "default", false] call BIS_fnc_taskCreate;
 	diag_log format ["DRO: Extract task created: %1", _taskCreated];
 	[
-		_heliTransports		
-	] execVM 'sunday_system\heliExtractionSupport.sqf';	
-} else {	
+		_heliTransports
+	] execVM 'sunday_system\heliExtractionSupport.sqf';
+} else {
 	_taskCreated = ["taskExtract", true, ["Leave the AO by any means to extract. Helicopter transport is unavailable.", "Extract", ""], objNull, "CREATED", 5, true, true, "default", true] call BIS_fnc_setTask;
 	//_taskCreated = [DROgroupPlayers, ["taskExtract"], ["Leave the AO by any means to extract. Helicopter transport is unavailable.", "Extract", ""], objNull, true, 5, true, "default", false] call BIS_fnc_taskCreate;
 	diag_log format ["DRO: Extract task created: %1", _taskCreated];
@@ -910,19 +917,19 @@ trgExtract = createTrigger ["EmptyDetector", _center, true];
 trgExtract setTriggerArea [(aoSize/2), (aoSize/2), 0, true];
 trgExtract setTriggerActivation ["ANY", "PRESENT", false];
 trgExtract setTriggerStatements [
-	"		
+	"
 		({vehicle _x in thisList} count allPlayers == 0) &&
 		({alive _x} count allPlayers > 0)
 	",
 	"
-		['taskExtract', 'SUCCEEDED', true] spawn BIS_fnc_taskSetState;		
+		['taskExtract', 'SUCCEEDED', true] spawn BIS_fnc_taskSetState;
 		if (isMultiplayer) then {
 			diag_log 'DRO: Ending MP mission: success';
 			'Won' call BIS_fnc_endMissionServer;
 		} else {
 			diag_log 'DRO: Ending SP mission: success';
 			'end1' call BIS_fnc_endMission;
-		};		
+		};
 	",
 	""
 ];
@@ -938,6 +945,3 @@ diag_log "DRO: Init staggered attack";
 
 // Music
 [["LeadTrack02_F_Mark",0,1],"bis_fnc_playmusic",true] call BIS_fnc_MP;
-
-
-
