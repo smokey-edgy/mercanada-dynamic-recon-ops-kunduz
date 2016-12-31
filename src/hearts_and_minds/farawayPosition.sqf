@@ -1,7 +1,7 @@
 params ["_position"];
 private ["_xPos", "_yPos", "_farawayX", "_farawayY", "_size", "_worldCenter", "_scale"];
 
-_scale = 0.66;
+_scale = 0.56;
 
 _xPos = (_position select 0) * _scale;
 _yPos = (_position select 1) * _scale;
@@ -26,7 +26,7 @@ if(_yPos < _worldCenter) then {
   _farawayY = 0;
 };
 
-if(_yPos > _worldCenter) then {  
+if(_yPos > _worldCenter) then {
   diag_log format ["HM_fnc_farawayPosition: [%1, %2] means your faraway Y is at the top of the map", _xPos, _yPos];
   _farawayY = _size;
 };

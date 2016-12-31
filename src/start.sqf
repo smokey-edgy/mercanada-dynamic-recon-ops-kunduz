@@ -55,6 +55,7 @@ fnc_selectReactiveObjective = compile preprocessFile "sunday_system\objectives\s
 fnc_defineFactionClasses = compile preprocessFile "sunday_system\defineFactionClasses.sqf";
 fnc_generateEngagements = compile preprocessFile "hearts_and_minds\generateEngagements.sqf";
 fnc_farawayPosition = compile preprocessFile "hearts_and_minds\farawayPosition.sqf";
+fnc_plantIEDs = compile preprocessFile "hearts_and_minds\plantIEDs.sqf";
 
 blackList = [];
 
@@ -783,6 +784,9 @@ _farawayPosition = [_playerGroupPosition] call fnc_farawayPosition;
 
 diag_log format ["HM: About to generate ANA and OpFor engagements"];
 [_farawayPosition] call fnc_generateEngagements;
+
+diag_log format ["HM: Planting IEDs"];
+[_center] call fnc_plantIEDs;
 
 // *****
 // MISC EXTRAS

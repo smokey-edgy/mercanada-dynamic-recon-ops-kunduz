@@ -6,7 +6,7 @@ _yPos = _position select 1;
 
 diag_log format ["HM_fnc_generateEngagements: Engagements are being generated around %1", _position];
 
-ME_fnc_nearestRoad = {
+HM_fnc_nearestRoad = {
   params ["_xPos", "_yPos"];
   private ["_distances", "_nearestRoad"];
 
@@ -52,7 +52,7 @@ HM_fnc_spawnAnaSquad = {
   params ["_xPos", "_yPos", "_suitableEngagementLocation"];
   private ["_patrolGroup", "_leader", "_nearestRoad", "_nearestCity", "_wp", "_trigger"];
 
-  _nearestRoad = ([_xPos, _yPos] call ME_fnc_nearestRoad);
+  _nearestRoad = ([_xPos, _yPos] call HM_fnc_nearestRoad);
 
   _patrolGroup = [position _nearestRoad, playerSide, 13] call BIS_fnc_spawnGroup;
   _patrolGroup setFormation "FILE";
@@ -97,7 +97,7 @@ HM_fnc_spawnOpforInCompounds = {
 _suitableEngagementLocation = [_xPos, _yPos] call HM_fnc_suitableEngagementLocation;
 
 diag_log format ["HM_fnc_generateEngagements: Suitable engagement location found at %1", position (_suitableEngagementLocation select 0)];
-diag_log format ["HM_fnc_generateEngagements:: There are %1 compounds there", count (_suitableEngagementLocation select 1)];
+diag_log format ["HM_fnc_generateEngagements: There are %1 compounds there", count (_suitableEngagementLocation select 1)];
 
 [_xPos, _yPos, _suitableEngagementLocation] call HM_fnc_spawnAnaSquad;
 [_xPos, _yPos, _suitableEngagementLocation] call HM_fnc_spawnOpforInCompounds;
