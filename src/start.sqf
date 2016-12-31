@@ -54,6 +54,7 @@ fnc_selectObjective = compile preprocessFile "sunday_system\objSelect.sqf";
 fnc_selectReactiveObjective = compile preprocessFile "sunday_system\objectives\selectReactiveTask.sqf";
 fnc_defineFactionClasses = compile preprocessFile "sunday_system\defineFactionClasses.sqf";
 fnc_generateEngagements = compile preprocessFile "hearts_and_minds\generateEngagements.sqf";
+fnc_farawayPosition = compile preprocessFile "hearts_and_minds\farawayPosition.sqf";
 
 blackList = [];
 
@@ -778,9 +779,10 @@ waitUntil {scriptDone _setupPlayersHandle};
 diag_log "DRO: setupPlayersFaction completed";
 
 _playerGroupPosition = position (playerGroup select 0);
+_farawayPosition = [_playerGroupPosition] call fnc_farawayPosition;
 
 diag_log format ["HM: About to generate ANA and OpFor engagements"];
-[_playerGroupPosition] call fnc_generateEngagements;
+[_farawayPosition] call fnc_generateEngagements;
 
 // *****
 // MISC EXTRAS

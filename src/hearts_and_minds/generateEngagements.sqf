@@ -4,7 +4,7 @@ private ["_xPos", "_yPos", "_suitableEngagementLocation"];
 _xPos = _position select 0;
 _yPos = _position select 1;
 
-diag_log format ["HM: Engagements are being generated around %1", _position];
+diag_log format ["HM_fnc_generateEngagements: Engagements are being generated around %1", _position];
 
 ME_fnc_nearestRoad = {
   params ["_xPos", "_yPos"];
@@ -34,6 +34,7 @@ HM_fnc_suitableEngagementLocation = {
     scopeName "findingSuitableEngagementLocation";
 
     _nearestLocation = (nearestLocations [[_xPos, _yPos], ["NameLocal","NameVillage","NameCity","NameCityCapital"], _x]) select 0;
+    _bestCompounds = [];
 
     if(!isNil "_nearestLocation") then {
       _bestCompounds = selectBestPlaces [position _nearestLocation, 500, "houses", 1, 10];
@@ -63,13 +64,17 @@ HM_fnc_spawnAnaSquad = {
   _trigger = createTrigger ["EmptyDetector", position _nearestCity];
   _trigger setTriggerArea  [200, 200, 0, false];
   _trigger setTriggerActivation ["WEST", "PRESENT", true];
-  _trigger setTriggerStatements ["this", "{(group _x) setBehaviour 'COMBAT'; } forEach thisList;",
+  _trigger setTriggerStatements ["this", "{_wp = [(group _x), 1];
+                                            _wp setWaypointBehaviour 'COMBAT';
+                                            _wp setWaypointSpeed 'NORMAL';
+                                            _wp setWaypointType 'SAD';
+                                            } forEach thisList;",
                                     ""];
 
   _wp = _patrolGroup addWaypoint [position _nearestCity, 0];
   _wp setWaypointSpeed "LIMITED";
   _wp setWaypointBehaviour "CARELESS";
-  _wp setWaypointType "MOVE";
+  _wp setWaypointType "SAD";
 };
 
 HM_fnc_spawnOpforInCompounds = {
@@ -91,8 +96,8 @@ HM_fnc_spawnOpforInCompounds = {
 
 _suitableEngagementLocation = [_xPos, _yPos] call HM_fnc_suitableEngagementLocation;
 
-diag_log format ["HM: Suitable engagement location found at %1", position (_suitableEngagementLocation select 0)];
-diag_log format ["HM: There are %1 compounds there", count (_suitableEngagementLocation select 1)];
+diag_log format ["HM_fnc_generateEngagements: Suitable engagement location found at %1", position (_suitableEngagementLocation select 0)];
+diag_log format ["HM_fnc_generateEngagements:: There are %1 compounds there", count (_suitableEngagementLocation select 1)];
 
 [_xPos, _yPos, _suitableEngagementLocation] call HM_fnc_spawnAnaSquad;
 [_xPos, _yPos, _suitableEngagementLocation] call HM_fnc_spawnOpforInCompounds;
