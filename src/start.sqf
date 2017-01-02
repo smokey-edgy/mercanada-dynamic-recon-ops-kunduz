@@ -46,6 +46,8 @@ firstLobbyOpen = true;
 publicVariable "firstLobbyOpen";
 enemyIntelMarkers = [];
 publicVariable "enemyIntelMarkers";
+heliIntroCutsceneDone = false;
+publicVariable "heliIntroCutsceneDone";
 
 diag_log "DRO: Compile scripts";
 
@@ -56,8 +58,12 @@ fnc_defineFactionClasses = compile preprocessFile "sunday_system\defineFactionCl
 fnc_generateEngagements = compile preprocessFile "hearts_and_minds\generateEngagements.sqf";
 fnc_farawayPosition = compile preprocessFile "hearts_and_minds\farawayPosition.sqf";
 fnc_plantIEDs = compile preprocessFile "hearts_and_minds\plantIEDs.sqf";
+fnc_heliIntroCutscene = compile preprocessFile "hearts_and_minds\heliIntroCutscene.sqf";
 
 blackList = [];
+
+_heliIntroCutscene = [] execVM "hearts_and_minds\heliIntroCutscene.sqf";
+waitUntil { heliIntroCutsceneDone };
 
 // *****
 // EXTRACT FACTION DATA
