@@ -58,7 +58,6 @@ fnc_defineFactionClasses = compile preprocessFile "sunday_system\defineFactionCl
 fnc_generateEngagements = compile preprocessFile "hearts_and_minds\generateEngagements.sqf";
 fnc_farawayPosition = compile preprocessFile "hearts_and_minds\farawayPosition.sqf";
 fnc_plantIEDs = compile preprocessFile "hearts_and_minds\plantIEDs.sqf";
-fnc_heliIntroCutscene = compile preprocessFile "hearts_and_minds\heliIntroCutscene.sqf";
 
 blackList = [];
 
