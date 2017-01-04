@@ -11722,7 +11722,7 @@ class Mission
 					class PositionInfo
 					{
 						position[]={2768.6499,55.315899,1751.948};
-						angles[]={6.2113123,0,6.2551899};
+						angles[]={0,4.2908411,0};
 					};
 					side="West";
 					flags=2;
@@ -11740,7 +11740,7 @@ class Mission
 					class PositionInfo
 					{
 						position[]={2768.6499,55.315899,1751.948};
-						angles[]={6.2113123,0,6.2551899};
+						angles[]={0,4.2908411,0};
 					};
 					side="West";
 					class Attributes
@@ -11757,7 +11757,7 @@ class Mission
 					class PositionInfo
 					{
 						position[]={2768.6499,55.315899,1751.948};
-						angles[]={6.2113123,0,6.2551899};
+						angles[]={0,4.2908411,0};
 					};
 					side="West";
 					class Attributes
@@ -11773,7 +11773,7 @@ class Mission
 					class PositionInfo
 					{
 						position[]={2768.6499,55.315899,1751.948};
-						angles[]={6.2113123,0,6.2551899};
+						angles[]={0,4.2908411,0};
 					};
 					side="West";
 					class Attributes
@@ -11786,7 +11786,7 @@ class Mission
 				class Item4
 				{
 					dataType="Waypoint";
-					position[]={47.962002,61.94273,561.73999};
+					position[]={47.962372,61.942726,561.73962};
 					type="Land";
 					expCond="{_x in (vehicle this)} count (units squadGroup) == 0;";
 					expActiv="missionNamespace setVariable [""squadHasDisembarkedAtFOB"", 1];";
@@ -11883,7 +11883,7 @@ class Mission
 			class PositionInfo
 			{
 				position[]={2768.7097,57.44738,1751.7448};
-				angles[]={6.2113123,0,6.2551899};
+				angles[]={0,4.2908411,0};
 			};
 			side="West";
 			flags=2;
