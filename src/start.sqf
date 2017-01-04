@@ -46,8 +46,6 @@ firstLobbyOpen = true;
 publicVariable "firstLobbyOpen";
 enemyIntelMarkers = [];
 publicVariable "enemyIntelMarkers";
-heliIntroCutsceneDone = false;
-publicVariable "heliIntroCutsceneDone";
 
 diag_log "DRO: Compile scripts";
 
@@ -60,9 +58,6 @@ fnc_farawayPosition = compile preprocessFile "hearts_and_minds\farawayPosition.s
 fnc_plantIEDs = compile preprocessFile "hearts_and_minds\plantIEDs.sqf";
 
 blackList = [];
-
-_heliIntroCutscene = [] execVM "hearts_and_minds\heliIntroCutscene.sqf";
-waitUntil { heliIntroCutsceneDone };
 
 // *****
 // EXTRACT FACTION DATA

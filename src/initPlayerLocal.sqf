@@ -4,7 +4,9 @@ waitUntil {!isNull player};
 
 player enableFatigue false;
 
-cutText ["", "BLACK FADED"];
+[] execVM "hearts_and_minds\heliIntroDateTimeLocationText.sqf";
+waitUntil {(missionNamespace getVariable ["squadHasDisembarkedAtFOB", 0]) == 1};
+sleep 10;
 
 #include "sunday_system\sundayFunctions.sqf"
 #include "sunday_revive\reviveFunctions.sqf";
@@ -16,7 +18,7 @@ Dynamic Recon Ops is a randomised, replayable scenario that generates an enemy o
 Select your AO location, the factions you want to use and any supports available or leave them all randomised and see what mission you are sent on.<br /><br />
 Thank you for playing! If you have any feedback or bug reports please email me at mbrdmn@gmail.com.
 <br /><br />
-If you've enjoyed DRO and want to support further development of this mission and what comes next please consider donating through my Patreon page (www.patreon.com/mbrdmn). 
+If you've enjoyed DRO and want to support further development of this mission and what comes next please consider donating through my Patreon page (www.patreon.com/mbrdmn).
 Everything is appreciated and will directly go towards new content for DRO and my planned future missions.
 "]];
 
@@ -31,7 +33,7 @@ if (didJIP) exitWith {
 	} else {
 		player setPos (getMarkerPos "respawn");
 	};
-	cutText ["", "BLACK IN", 3];	
+	cutText ["", "BLACK IN", 3];
 };
 
 diag_log format ["clientOwner = %1", clientOwner];
@@ -48,16 +50,16 @@ if (player == u1) then {
 	diag_log "DRO: Create menu dialog";
 	_handle = createDialog "sundayDialog";
 	diag_log format ["DRO: Created dialog: %1", _handle];
-	[] execVM "sunday_system\dialogs\populateStartupMenu.sqf";	
-};	
+	[] execVM "sunday_system\dialogs\populateStartupMenu.sqf";
+};
 
 waitUntil {(missionNameSpace getVariable ["serverReady", 0]) == 1};
 diag_log format ["DRO: Player %1 init", player];
 waitUntil{(missionNameSpace getVariable ["weatherChanged", 0]) == 0};
 
-while {(missionNameSpace getVariable ["weatherChanged", 0]) == 0} do {	
+while {(missionNameSpace getVariable ["weatherChanged", 0]) == 0} do {
 	if (player == u1) then {
-		//cutText ["Extracting faction data", "BLACK FADED"];	
+		//cutText ["Extracting faction data", "BLACK FADED"];
 	} else {
 		cutText ["Please wait while mission is generated", "BLACK FADED"];
 	};
@@ -69,7 +71,7 @@ addWeaponItemEverywhere = compileFinal " _this select 0 addPrimaryWeaponItem (_t
 addHandgunItemEverywhere = compileFinal " _this select 0 addHandgunItem (_this select 1); ";
 removeWeaponItemEverywhere = compileFinal "_this select 0 removePrimaryWeaponItem (_this select 1)";
 
-while {(missionNameSpace getVariable ["objectivesSpawned", 0]) == 0} do {	
+while {(missionNameSpace getVariable ["objectivesSpawned", 0]) == 0} do {
 	cutText ["Please wait while mission is generated", "BLACK FADED"];
 };
 
@@ -97,7 +99,7 @@ _introNameHandle = CreateDialog "DRO_introDialog";
 _extendPos = [_camEndPos, 500, (random 360)] call dro_extendPos;
 _heightStart = getTerrainHeightASL _extendPos;
 if (_heightStart < _heightEnd) then {
-	_heightStart = _heightEnd; 
+	_heightStart = _heightEnd;
 };
 if (_heightStart < 20) then {_heightStart = 0};
 _camStartPos = [(_extendPos select 0), (_extendPos select 1), (_heightStart+20)];
@@ -110,14 +112,14 @@ cam camSetTarget _camEndPos;
 cam camCommit 0;
 if (timeOfDay == 4) then {
 	camUseNVG true;
-};	
+};
 cameraEffectEnableHUD false;
 cam camPreparePos _camEndPos;
 cam camCommitPrepared 50;
 
 diag_log format ["DRO: Player %1 camera initialised", player];
 
-waitUntil{(missionNameSpace getVariable ["factionsChosen", 0]) == 1};	
+waitUntil{(missionNameSpace getVariable ["factionsChosen", 0]) == 1};
 
 diag_log format ["DRO: Player %1 arsenal start selected", player];
 //["BlackAndWhite"] call BIS_fnc_setPPeffectTemplate;
@@ -134,8 +136,8 @@ closeDialog 1;
 
 cam cameraEffect ["terminate","back"];
 camUseNVG false;
-camDestroy cam;	
-diag_log format ["DRO: Player %1 cam terminated", player];	
+camDestroy cam;
+diag_log format ["DRO: Player %1 cam terminated", player];
 
 // Open map
 _mapOpen = openMap [true, false];
@@ -155,35 +157,35 @@ _handle = CreateDialog "DRO_lobbyDialog";
 diag_log format ["DRO: Player %1 created DRO_lobbyDialog: %2", player, _handle];
 [] execVM "sunday_system\dialogs\populateLobby.sqf";
 
-_actionID = player addAction ["Open Team Planning", 
+_actionID = player addAction ["Open Team Planning",
 	{
 		_handle = CreateDialog "DRO_lobbyDialog";
 		[] execVM "sunday_system\dialogs\populateLobby.sqf";
 	}, nil, 6];
-	
+
 diag_log format ["DRO: Player %1 waiting for all arsenals to close", player];
 
 while {
 	_handle
 } do {
-	sleep 1;	
-	
+	sleep 1;
+
 	if ((getMarkerColor "campMkr" == "")) then {
 		((findDisplay 626262) displayCtrl 6006) ctrlSetText "Insertion position: RANDOM";
 	} else {
-		((findDisplay 626262) displayCtrl 6006) ctrlSetText format ["Insertion position: %1", (mapGridPosition (getMarkerPos 'campMkr'))];			
-	};		
-	
+		((findDisplay 626262) displayCtrl 6006) ctrlSetText format ["Insertion position: %1", (mapGridPosition (getMarkerPos 'campMkr'))];
+	};
+
 	if ((missionNameSpace getVariable "lobbyComplete") == 1) exitWith {
-		closeDialog 1;			
-	};	
+		closeDialog 1;
+	};
 };
 
 waitUntil {((missionNameSpace getVariable "lobbyComplete") == 1)};
 
 // Close dialogs twice in case player has arsenal open
-closeDialog 1;	
-closeDialog 1;	
+closeDialog 1;
+closeDialog 1;
 
 player removeAction _actionID;
 
@@ -237,6 +239,3 @@ sleep 6;
 _missionName = missionNameSpace getVariable "mName";
 _string = format ["<t font='EtelkaMonospaceProBold' color='#ffffff' size = '1.7'>%1</t>", _missionName];
 [parseText format [ "<t font='EtelkaMonospaceProBold' color='#ffffff' size = '1.7'>%1</t>", toUpper _missionName], true, nil, 7, 0.7, 0] spawn BIS_fnc_textTiles;
-
-
-
